@@ -1,13 +1,11 @@
 import numpy as np
-# import sys
-# sys.path.append('/home/ent/Smilei_ionization/simulations/')
 
 
-l0 = 2.0*np.pi                # laser wavelength
-t0 = l0                       # optical cicle
-Lsim = [12.*l0]               # length of the simulation
-Tsim = 24.*t0                 # duration of the simulation               
-resx = 128.                    # nb of cells in one laser wavelength
+l0 = 2.0*np.pi                
+t0 = l0                       
+Lsim = [12.*l0]               
+Tsim = 24.*t0                           
+resx = 128.                   
 dx = dy = dz = l0/resx
 cell_length  = [dx]
 dt  = 0.95*dx/np.sqrt(1.)
@@ -35,17 +33,15 @@ m_e_SI = 9.1093837e-31                  # kg
 N_r = eps0*m_e_SI*omega_ref**2/charge_SI**2
 print('Reference density = ',N_r*10**(-6), ' cm-3')
 
-I_S = 4.65e29                #W/cm^2
-l_C =  3.8615901e-13         #m
+I_S = 4.65e29                # W/cm^2
+l_C =  3.8615901e-13         # m
 I_ref = 0.5*(a0*omega_ref*l_C/c)**2.*4.65e29
-print('Reference intensity = ',I_ref, ' W/cm^2')
+print('Laser peak intensity = ',I_ref, ' W/cm^2')
 
 
-# n0 = 5.e13/(N_r*1.e-6)  # initial density 5.e13 cm^(-3)
-# nppc = 16                               # nb of particle per cells
 
-
-n0 = 5.e13/(N_r*1.e-6)
+n0 = 5.e13/(N_r*1.e-6)      # 5.e13 
+print('Target density = ', n0*N_r*10**(-6), ' cm-3')
 thickness = 0.25*l0
 position = Lsim[0]/2.-thickness/2.
 def nf(x):
@@ -159,7 +155,6 @@ Species(
     charge = -1.0,
     charge_density = 0.0,
     boundary_conditions = [['remove','remove']],
-#   time_frozen = 2.*Tsim
 )
 
 
