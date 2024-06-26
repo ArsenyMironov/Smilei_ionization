@@ -74,7 +74,7 @@ superscriptaddress,
 	\subsubsection{Implementation details}
 	The magnetic quantum number $m$ is attributed to each electron in accordance with the following rules. 
 	\begin{enumerate}
-		\item Since $\Gamma_Z(m=0)>\Gamma_Z(|m|=1)>\Gamma_Z(|m|=2)>\ldots$, we assume that electrons in the state with the lowest value of $|m|$ are ionized first.
+		\item Since $\Gamma_Z(m=0)>\Gamma_Z(|m|=1)>\Gamma_Z(|m|=2)>\ldots$, we assume that for electrons with the same azimuthal quantum number $l$, the states with the lowest value of $|m|$ are ionized first.
 		
 		\clearpage
 		\item Electrons with the same azimuthal quantum number $l$ occupy the sub-shells in the order of increasing $|m|$ and for the same $|m|$ in the order of increasing $m$:
@@ -87,7 +87,6 @@ superscriptaddress,
 		
 		For example, for the atomic configuration with 3 $p$-electrons ($l=1$) in the outer shell,  we choose $m=0,\, 0, -1$ for these electrons. 
 		
-		\item The states with lower $|m|$ are ionized first. 
 		
 	\end{enumerate}
 	With this algorithm, by knowing the atomic number $A$, we can assign a unique set of quantum numbers $nlm$ to each electron on the atomic sub-shells and identify their extraction order during successive ionization. 
@@ -101,10 +100,12 @@ superscriptaddress,
 			Ionization order & 1 & 2 &  3 &  4 & 5 & 6 &  7 &  8 & 9 & 10 & 11 & 12
 		\end{tabular}
 	\end{table}		
+
+	Note that this hypothesis may be quite strong, as, when the $p$ shell is not full, in principle, electrons could occupy states in different order. Though, it is good enough for the checks whether the effect of $|m|>0$ states is relevant for the simulated physics. 
 	
 	The values for $m$ for each atom with $A=1\ldots99$ are stored in \texttt{Smilei/src/Ionization/IonizationTables.h} in the table named \texttt{magneticQuantumNumber}, which is similar to the table for $l$ used in the tunnelling formula \eqref{tunnel} in the standard SMILEI package. The table for $m$ was generated based on the table for $l$ following the rules presented above.
 	
-	\textbf{Important note!} As a temporary solution for the $f$- ($l=3$) and higher shells, $m$ is always set to zero [namely, the rates are calculated with Eqs.~\eqref{tunnel}-\eqref{gamma_Delta}]. This is due to possible sub-level overlap for the $d$- and $f$-shells, that cannot be reproduced with the described algorithm for the table generation. This issue is to be resolved in the future.
+	\textbf{Important note!} As a temporary solution for the $f$- and higher shells ($l\geq 3$) , $m$ is always set to zero [namely, the rates are calculated with Eqs.~\eqref{tunnel}-\eqref{gamma_Delta}]. This is due to possible sub-level overlap for the $d$- and $f$-shells, that cannot be reproduced with the described algorithm for the table generation. This issue is to be resolved in the future.
 	
 	
 	\clearpage
@@ -122,7 +123,7 @@ superscriptaddress,
 		\Gamma_{Z}^\text{TL}=\Gamma_{Z}\times \exp\left[ -E\lambda(Z) \right] ,\\
 		\lambda(Z) = \frac{\alpha_{\text{TL}} c^{*2}}{\gamma(Z)},
 	\end{gather}
-	where $\gamma(Z)$ is given by Eq.~\eqref{gamma_Delta}.
+	where $\Gamma_Z$ and $\gamma(Z)$ are given in Eqs.~\eqref{tunnel} and \eqref{gamma_Delta}, respectively.
 	
 	The model is implemented in file \texttt{Smilei/src/Ionization/IonizationTunnelTL.cpp} and can be used in the namelist by putting \texttt{ionization\_model = 'tunnel\_TL'} in the corresponding atom \texttt{Species}. The $\alpha_{\text{TL}}$ can be set with the (newly added) parameter \texttt{ionization\_tl\_parameter = <value>} in the corresponding \texttt{Species}
 	(set to 6 by default).
