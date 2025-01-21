@@ -82,6 +82,21 @@ public:
     //! alpha parameter in the Tong-Lin ionization model
     double ionization_tl_parameter_;
 
+    //! model for Cnl coefficients in the tunneling formula
+    //! 0 for ADK (default)
+    //! 1 for PPT (Hartree)
+    //! 2 for custom table provided in cnl_squared_table_
+    unsigned int cnl_model_;
+
+    //! True: m=0 for all electrons during ionization (default)
+    //! False: m!=0 and is taken from IonizationTables::magnetic_atomic_number
+    bool m_equal_zero_;
+    bool use_g_factor_;
+
+    //! array of custom Cnl^2 values (in the notation of PPT and ADK) for all atomic states, should be of length Z
+    //! used when cnl_model_ == 2
+    std::vector<double> cnl_squared_table_;
+
     //! user defined ionization rate profile
     PyObject *ionization_rate_;
 

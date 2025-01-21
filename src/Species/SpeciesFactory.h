@@ -740,8 +740,21 @@ public:
             this_species->maximum_charge_state_ = 0;
             PyTools::extract( "maximum_charge_state", this_species->maximum_charge_state_, "Species", ispec);
     
+            this_species->cnl_model_ = 0;
+            PyTools::extract( "cnl_model", this_species->cnl_model_, "Species", ispec);
+
+            this_species->m_equal_zero_ = true;
+            PyTools::extract( "m_equal_zero", this_species->m_equal_zero_, "Species", ispec);
+
+            this_species->use_g_factor_ = false;
+            PyTools::extract( "use_g_factor", this_species->use_g_factor_, "Species", ispec);
+
             this_species->ionization_tl_parameter_ = 6;
             PyTools::extract( "ionization_tl_parameter", this_species->ionization_tl_parameter_, "Species", ispec);
+
+            std::vector<double> cnl_sq_tab(this_species->atomic_number_);
+            PyTools::extractV( "cnl_squared_table", cnl_sq_tab, "Species", ispec);
+            this_species->cnl_squared_table_ = cnl_sq_tab;
 
             std::string model;
             PyTools::extract( "ionization_model", model, "Species", ispec );
@@ -763,7 +776,11 @@ public:
                         LINK_NAMELIST + std::string("#species") );
                 }
 
-                if( (model == "tunnel") || (model == "tunnel_BSI") || (model == "tunnel_TL") || (model == "tunnel_full_PPT") ){
+                if( (model == "tunnel") || (model == "tunnel_BSI") || \
+                    (model == "tunnel_TL") || (model == "tunnel_full_PPT")  || \
+                    (model == "tunnel_PPT") || (model == "tunnel_full_ADK") || \
+                    (model == "tunnel_custom_coefficient") || (model == "tunnel_custom_coefficient_BSI") || \
+                    (model == "tunnel_custom_coefficient_TL")|| (model == "tunnel_custom_coefficient_G") ) {
                     if (params.Laser_Envelope_model){
                         ERROR_NAMELIST("An envelope is present, so tunnel_envelope or tunnel_envelope_averaged ionization model should be selected for species "<<species_name,
                         LINK_NAMELIST + std::string("#species"));
@@ -1032,6 +1049,11 @@ public:
         new_species->thermal_momentum_                         = species->thermal_momentum_;
         new_species->atomic_number_                            = species->atomic_number_;
         new_species->maximum_charge_state_                     = species->maximum_charge_state_;
+        new_species->ionization_tl_parameter_                  = species->ionization_tl_parameter_;
+        new_species->cnl_model_                                = species->cnl_model_;
+        new_species->m_equal_zero_                             = species->m_equal_zero_;
+        new_species->use_g_factor_                             = species->use_g_factor_;
+        new_species->cnl_squared_table_                        = species->cnl_squared_table_;
         new_species->ionization_rate_                          = species->ionization_rate_;
         if( new_species->ionization_rate_!=Py_None ) {
             Py_INCREF( new_species->ionization_rate_ );
