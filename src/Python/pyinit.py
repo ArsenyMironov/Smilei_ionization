@@ -435,6 +435,10 @@ class Species(SmileiComponent):
     cnl_squared_table = []
     m_equal_zero = True
     use_g_factor = False
+    ionization_potentials = []
+    azimuthal_quantum_numbers = []
+    magnetic_quantum_numbers = []
+    g_factors = []
     is_test = False
     relativistic_field_initialization = False
     keep_interpolated_fields = []

@@ -14,6 +14,8 @@
 #include "IonizationTunnelCustomCoeffBSI.h"
 #include "IonizationTunnelCustomCoeffTL.h"
 #include "IonizationTunnelCustomCoeffG.h"
+#include "IonizationTunnelCustomTables.h"
+#include "IonizationTunnelCustomTablesTL.h"
 
 #include "Params.h"
 
@@ -177,6 +179,26 @@ public:
             }
 
             Ionize = new IonizationTunnelCustomCoeffG( params, species );
+        } else if(model == "tunnel_custom_tables") { 
+            if( species->max_charge_ > ( int )species->atomic_number_ ) {
+                ERROR( "Charge > atomic_number for species " << species->name_ );
+            }
+
+            if( params.Laser_Envelope_model ) {
+                ERROR( "The ionization model for species interacting with envelope is tunnel_envelope_averaged" );
+            }
+
+            Ionize = new IonizationTunnelCustomTables( params, species );
+        } else if(model == "tunnel_custom_tables_TL") { 
+            if( species->max_charge_ > ( int )species->atomic_number_ ) {
+                ERROR( "Charge > atomic_number for species " << species->name_ );
+            }
+
+            if( params.Laser_Envelope_model ) {
+                ERROR( "The ionization model for species interacting with envelope is tunnel_envelope_averaged" );
+            }
+
+            Ionize = new IonizationTunnelCustomTablesTL( params, species );
         }
         
         return Ionize;

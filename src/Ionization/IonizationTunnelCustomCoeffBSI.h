@@ -22,6 +22,7 @@ class IonizationTunnelCustomCoeffBSI : public Ionization {
         std::vector<double> alpha_tunnel, beta_tunnel, gamma_tunnel; 
 
         std::vector<double> Magnetic_quantum_number;
+        std::vector<double> Principal_quantum_number;
         unsigned int cnl_model_;
         bool m_equal_zero_, use_g_factor_;
         std::vector<double> cnl_squared_table_;

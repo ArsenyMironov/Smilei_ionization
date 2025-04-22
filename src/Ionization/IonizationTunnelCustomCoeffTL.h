@@ -28,6 +28,7 @@ private:
     std::vector<double> Potential;
     std::vector<double> Azimuthal_quantum_number;
     std::vector<double> Magnetic_quantum_number;
+    std::vector<double> Principal_quantum_number;
     
     double one_third;
     double ionization_tl_parameter_;

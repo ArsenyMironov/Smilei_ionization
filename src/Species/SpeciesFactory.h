@@ -756,6 +756,23 @@ public:
             PyTools::extractV( "cnl_squared_table", cnl_sq_tab, "Species", ispec);
             this_species->cnl_squared_table_ = cnl_sq_tab;
 
+
+            std::vector<double> ion_pots(this_species->atomic_number_);
+            PyTools::extractV( "ionization_potentials", ion_pots, "Species", ispec);
+            this_species->ionization_potentials_ = ion_pots;
+
+            std::vector<double> l_nums(this_species->atomic_number_);
+            PyTools::extractV( "azimuthal_quantum_numbers", l_nums, "Species", ispec);
+            this_species->azimuthal_quantum_numbers_ = l_nums;
+
+            std::vector<double> m_nums(this_species->atomic_number_);
+            PyTools::extractV( "magnetic_quantum_numbers", m_nums, "Species", ispec);
+            this_species->magnetic_quantum_numbers_ = m_nums;
+
+            std::vector<double> g_nums(this_species->atomic_number_);
+            PyTools::extractV( "g_factors", g_nums, "Species", ispec);
+            this_species->g_factors_ = g_nums;         
+
             std::string model;
             PyTools::extract( "ionization_model", model, "Species", ispec );
             if( model!="none" ) {
@@ -780,7 +797,8 @@ public:
                     (model == "tunnel_TL") || (model == "tunnel_full_PPT")  || \
                     (model == "tunnel_PPT") || (model == "tunnel_full_ADK") || \
                     (model == "tunnel_custom_coefficient") || (model == "tunnel_custom_coefficient_BSI") || \
-                    (model == "tunnel_custom_coefficient_TL")|| (model == "tunnel_custom_coefficient_G") ) {
+                    (model == "tunnel_custom_coefficient_TL")|| (model == "tunnel_custom_coefficient_G") || \
+                    (model == "tunnel_custom_tables") || (model == "tunnel_custom_tables_TL")) {
                     if (params.Laser_Envelope_model){
                         ERROR_NAMELIST("An envelope is present, so tunnel_envelope or tunnel_envelope_averaged ionization model should be selected for species "<<species_name,
                         LINK_NAMELIST + std::string("#species"));
@@ -1054,6 +1072,10 @@ public:
         new_species->m_equal_zero_                             = species->m_equal_zero_;
         new_species->use_g_factor_                             = species->use_g_factor_;
         new_species->cnl_squared_table_                        = species->cnl_squared_table_;
+        new_species->ionization_potentials_                    = species->ionization_potentials_;
+        new_species->azimuthal_quantum_numbers_                = species->azimuthal_quantum_numbers_;
+        new_species->magnetic_quantum_numbers_                 = species->magnetic_quantum_numbers_;
+        new_species->g_factors_                                = species->g_factors_;
         new_species->ionization_rate_                          = species->ionization_rate_;
         if( new_species->ionization_rate_!=Py_None ) {
             Py_INCREF( new_species->ionization_rate_ );

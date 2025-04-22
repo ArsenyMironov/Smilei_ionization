@@ -1,4 +1,4 @@
-#include "IonizationTunnelCustomCoeffG.h"
+#include "IonizationTunnelCustomTables.h"
 #include "IonizationTables.h"
 
 #include <cmath>
@@ -10,47 +10,16 @@ using namespace std;
 
 
 
-IonizationTunnelCustomCoeffG::IonizationTunnelCustomCoeffG( Params &params, Species *species ) : Ionization( params, species )
+IonizationTunnelCustomTables::IonizationTunnelCustomTables( Params &params, Species *species ) : Ionization( params, species )
 {
     DEBUG( "Creating the Tunnel Ionizaton CustomCoeff class" );
     
-    atomic_number_          = species->atomic_number_;
-    m_equal_zero_           = species->m_equal_zero_;
-    cnl_model_              = species->cnl_model_;
-
-    
-    // Ionization potential & quantum numbers (all in atomic units 1 au = 27.2116 eV)
-    Potential.resize( atomic_number_ );
-    Azimuthal_quantum_number.resize( atomic_number_ );
-    for( int Zstar=0; Zstar<( int )atomic_number_; Zstar++ ) {
-        Potential               [Zstar] = IonizationTables::ionization_energy( atomic_number_, Zstar ) * eV_to_au;
-        Azimuthal_quantum_number[Zstar] = IonizationTables::azimuthal_atomic_number( atomic_number_, Zstar );
-    }
-
-    g_factor.resize( atomic_number_ );
-    std::fill(g_factor.begin(), g_factor.end(), 1);
-
-    if( !m_equal_zero_ ) {
-        Magnetic_quantum_number.resize( atomic_number_ );
-        Principal_quantum_number.resize( atomic_number_ );
-        for( int Zstar=0; Zstar<( int )atomic_number_; Zstar++ ) {
-            Magnetic_quantum_number[Zstar] = IonizationTables::magnetic_atomic_number( atomic_number_, Zstar );
-            Principal_quantum_number[Zstar] = IonizationTables::principal_atomic_number( atomic_number_, Zstar );
-        }
-        for( int Zstar=0; Zstar<( int )atomic_number_; Zstar++ ) {
-            for( int i=Zstar+1; i<( int )atomic_number_; i++ ) {
-                if( (abs(Magnetic_quantum_number[Zstar]) == abs(Magnetic_quantum_number[i])) & 
-                    (Azimuthal_quantum_number[Zstar] == Azimuthal_quantum_number[i]) & 
-                    (Principal_quantum_number[Zstar] == Principal_quantum_number[i])) {
-                    g_factor[Zstar] += 1;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-
+    atomic_number_              = species->atomic_number_;
+    cnl_model_                  = species->cnl_model_;
+    Potential                   = species->ionization_potentials_;
+    Azimuthal_quantum_number    = species->azimuthal_quantum_numbers_;
+    Magnetic_quantum_number     = species->magnetic_quantum_numbers_;
+    g_factor                    = species->g_factors_;
     if( cnl_model_ == 2 ) {
         cnl_squared_table_          = species->cnl_squared_table_;
     };
@@ -66,20 +35,18 @@ IonizationTunnelCustomCoeffG::IonizationTunnelCustomCoeffG( Params &params, Spec
     gamma_tunnel.resize( atomic_number_ );
     
     for( unsigned int Z=0 ; Z<atomic_number_ ; Z++ ) {
+        Potential[Z] = Potential[Z] * eV_to_au;
+        
         DEBUG( "Z : " << Z );
         double cst      = ( ( double )Z+1.0 ) * sqrt( 2.0/Potential[Z] );
         double Cnl      = 1.;
         double Blm      = 1.;
         double abs_m    = 0.;
 
-        if( m_equal_zero_ ) {
-            Blm      = ( 2.*Azimuthal_quantum_number[Z]+1.0 );
-        } else {
-            abs_m    = abs(Magnetic_quantum_number[Z]);
-            Blm      = ( 2.*Azimuthal_quantum_number[Z]+1.0 ) * \
-                       tgamma(Azimuthal_quantum_number[Z]+abs_m+1) / \
-                       ( pow( 2, abs_m )*tgamma(abs_m+1)*tgamma(Azimuthal_quantum_number[Z]-abs_m+1) );
-        }
+        abs_m    = abs(Magnetic_quantum_number[Z]);
+        Blm      = ( 2.*Azimuthal_quantum_number[Z]+1.0 ) * \
+                   tgamma(Azimuthal_quantum_number[Z]+abs_m+1) / \
+                   ( pow( 2, abs_m )*tgamma(abs_m+1)*tgamma(Azimuthal_quantum_number[Z]-abs_m+1) );
 
         alpha_tunnel[Z] = cst-1.0-abs_m;
 
@@ -107,7 +74,7 @@ IonizationTunnelCustomCoeffG::IonizationTunnelCustomCoeffG( Params &params, Spec
 
 
 
-void IonizationTunnelCustomCoeffG::operator()( Particles *particles, unsigned int ipart_min, unsigned int ipart_max, vector<double> *Epart, Patch *patch, Projector *Proj, int ipart_ref )
+void IonizationTunnelCustomTables::operator()( Particles *particles, unsigned int ipart_min, unsigned int ipart_max, vector<double> *Epart, Patch *patch, Projector *Proj, int ipart_ref )
 {
 
     unsigned int Z, Zp1, newZ, k_times;

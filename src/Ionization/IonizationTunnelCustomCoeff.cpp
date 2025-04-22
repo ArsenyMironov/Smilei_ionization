@@ -32,13 +32,17 @@ IonizationTunnelCustomCoeff::IonizationTunnelCustomCoeff( Params &params, Specie
 
     if( !m_equal_zero_ ) {
         Magnetic_quantum_number.resize( atomic_number_ );
+        Principal_quantum_number.resize( atomic_number_ );
         for( int Zstar=0; Zstar<( int )atomic_number_; Zstar++ ) {
             Magnetic_quantum_number[Zstar] = IonizationTables::magnetic_atomic_number( atomic_number_, Zstar );
+            Principal_quantum_number[Zstar] = IonizationTables::principal_atomic_number( atomic_number_, Zstar );
         }
         if( use_g_factor_ ) {
             for( int Zstar=0; Zstar<( int )atomic_number_; Zstar++ ) {
                 for( int i=Zstar+1; i<( int )atomic_number_; i++ ) {
-                    if( (abs(Magnetic_quantum_number[Zstar]) == abs(Magnetic_quantum_number[i])) ) {
+                    if( (abs(Magnetic_quantum_number[Zstar]) == abs(Magnetic_quantum_number[i])) & 
+                        (Azimuthal_quantum_number[Zstar] == Azimuthal_quantum_number[i]) & 
+                        (Principal_quantum_number[Zstar] == Principal_quantum_number[i])) {
                         g_factor[Zstar] += 1;
                     } else {
                         break;
@@ -74,24 +78,25 @@ IonizationTunnelCustomCoeff::IonizationTunnelCustomCoeff( Params &params, Specie
         } else {
             abs_m    = abs(Magnetic_quantum_number[Z]);
             Blm      = ( 2.*Azimuthal_quantum_number[Z]+1.0 ) * \
-                       tgamma(Azimuthal_quantum_number[Z]+abs_m+1) / ( tgamma(abs_m+1)*tgamma(Azimuthal_quantum_number[Z]-abs_m+1) );
+                       tgamma(Azimuthal_quantum_number[Z]+abs_m+1) / \
+                       ( pow( 2, abs_m )*tgamma(abs_m+1)*tgamma(Azimuthal_quantum_number[Z]-abs_m+1) );
         }
 
         alpha_tunnel[Z] = cst-1.0-abs_m;
 
         if( cnl_model_ == 0 ) {
-            Cnl = pow( 2, alpha_tunnel[Z] ) / \
+            Cnl = pow( 2, cst-1.0 ) / \
                         ( cst*tgamma( cst ) );
         } else if( cnl_model_ == 1 ) {
             if( Z>0 ) {
-                Cnl = pow( 2, alpha_tunnel[Z] ) / \
+                Cnl = pow( 2, cst-1.0 ) / \
                         ( cst*tgamma( cst/2.0+Azimuthal_quantum_number[Z]+1 )*tgamma( cst/2.0-Azimuthal_quantum_number[Z]) );
             }
         } else {
             Cnl = cnl_squared_table_[Z];
         }
 
-        MESSAGE(0, "Z=" << Z << ", l=" << Azimuthal_quantum_number[Z] << ", |m|=" << abs_m << ", g=" << g_factor[Z] << ", Cnl=" << Cnl << ", Blm=" << Blm);
+        MESSAGE(0, "Z=" << Z << ", Ip=" << Potential[Z] << ", l=" << Azimuthal_quantum_number[Z] << ", |m|=" << abs_m << ", g=" << g_factor[Z] << ", Cnl=" << Cnl << ", Blm=" << Blm);
 
         beta_tunnel[Z] = g_factor[Z]*Cnl*4.*Blm * Potential[Z] * au_to_w0;
         gamma_tunnel[Z] = 2.0 * pow( 2.0*Potential[Z], 1.5 );
