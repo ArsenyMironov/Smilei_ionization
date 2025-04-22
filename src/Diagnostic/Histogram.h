@@ -318,9 +318,9 @@ class HistogramAxis_p : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = s->mass_ * sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                               + pow( s->particles->Momentum[1][ipart], 2 )
-                                               + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = s->mass_ * sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                               + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                               + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -329,9 +329,9 @@ class HistogramAxis_p : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                     + pow( s->particles->Momentum[1][ipart], 2 )
-                                     + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -347,9 +347,9 @@ class HistogramAxis_gamma : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                     + pow( s->particles->Momentum[1][ipart], 2 )
-                                     + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -358,9 +358,9 @@ class HistogramAxis_gamma : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                     + pow( s->particles->Momentum[1][ipart], 2 )
-                                     + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -376,9 +376,9 @@ class HistogramAxis_ekin : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = s->mass_ * ( sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                                 + pow( s->particles->Momentum[1][ipart], 2 )
-                                                 + pow( s->particles->Momentum[2][ipart], 2 ) ) - 1. );
+                array[ipart] = s->mass_ * ( sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] ) - 1. );
             }
         }
         // Photons
@@ -387,9 +387,9 @@ class HistogramAxis_ekin : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                     + pow( s->particles->Momentum[1][ipart], 2 )
-                                     + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -406,9 +406,9 @@ class HistogramAxis_vx : public HistogramAxis
                     continue;
                 }
                 array[ipart] = s->particles->Momentum[0][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -418,9 +418,9 @@ class HistogramAxis_vx : public HistogramAxis
                     continue;
                 }
                 array[ipart] = s->particles->Momentum[0][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -437,9 +437,9 @@ class HistogramAxis_vy : public HistogramAxis
                     continue;
                 }
                 array[ipart] = s->particles->Momentum[1][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -449,9 +449,9 @@ class HistogramAxis_vy : public HistogramAxis
                     continue;
                 }
                 array[ipart] = s->particles->Momentum[1][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -468,9 +468,9 @@ class HistogramAxis_vz : public HistogramAxis
                     continue;
                 }
                 array[ipart] = s->particles->Momentum[2][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -480,9 +480,9 @@ class HistogramAxis_vz : public HistogramAxis
                     continue;
                 }
                 array[ipart] = s->particles->Momentum[2][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -496,9 +496,9 @@ class HistogramAxis_v : public HistogramAxis
             if( index[ipart]<0 ) {
                 continue;
             }
-            array[ipart] = pow( 1. + 1./( pow( s->particles->Momentum[0][ipart], 2 )
-                                          + pow( s->particles->Momentum[1][ipart], 2 )
-                                          + pow( s->particles->Momentum[2][ipart], 2 ) ), -0.5 );
+            array[ipart] = 1.0 / sqrt( 1. + 1./( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] ) );
         }
     };
 };
@@ -513,11 +513,11 @@ class HistogramAxis_vperp2 : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = ( pow( s->particles->Momentum[1][ipart], 2 )
-                                 + pow( s->particles->Momentum[2][ipart], 2 )
-                               ) / ( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                     + pow( s->particles->Momentum[1][ipart], 2 )
-                                     + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = ( s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                 + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart]
+                               ) / ( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -526,11 +526,11 @@ class HistogramAxis_vperp2 : public HistogramAxis
                 if( index[ipart]<0 ) {
                     continue;
                 }
-                array[ipart] = ( pow( s->particles->Momentum[1][ipart], 2 )
-                                 + pow( s->particles->Momentum[2][ipart], 2 )
-                               ) / ( pow( s->particles->Momentum[0][ipart], 2 )
-                                     + pow( s->particles->Momentum[1][ipart], 2 )
-                                     + pow( s->particles->Momentum[2][ipart], 2 ) );
+                array[ipart] = ( s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                 + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart]
+                               ) / ( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -567,40 +567,40 @@ class HistogramAxis_user_function : public HistogramAxis
 public:
     HistogramAxis_user_function( PyObject *type_object ) :
         HistogramAxis(),
-        function( type_object ),
-        particleData( 0 )
-    {
-    };
+        function( type_object )
+    {};
     ~HistogramAxis_user_function()
     {
+        SMILEI_PY_ACQUIRE_GIL
         Py_DECREF( function );
+        SMILEI_PY_RELEASE_GIL
     };
 private:
     void calculate_locations( Species *s, double *array, int *index, unsigned int npart, SimWindow * )
     {
-        #pragma omp critical
+        PyArrayObject *ret;
+        SMILEI_PY_ACQUIRE_GIL
         {
             // Expose particle data as numpy arrays
-            particleData.resize( npart );
+            ParticleData particleData( npart );
             particleData.set( s->particles );
             // run the function
-            PyArrayObject *ret = ( PyArrayObject * )PyObject_CallFunctionObjArgs( function, particleData.get(), NULL );
-            particleData.clear();
-            // Copy the result to "array"
-            double *arr = ( double * ) PyArray_GETPTR1( ret, 0 );
-            for( unsigned int ipart = 0 ; ipart < npart ; ipart++ )
-            {
-                if( index[ipart]<0 ) {
-                    continue;
-                }
-                array[ipart] = arr[ipart];
-            }
-            Py_DECREF( ret );
+            ret = ( PyArrayObject * )PyObject_CallFunctionObjArgs( function, particleData.get(), NULL );
         }
+        // Copy the result to "array"
+        double *arr = ( double * ) PyArray_GETPTR1( ret, 0 );
+        for( unsigned int ipart = 0 ; ipart < npart ; ipart++ )
+        {
+            if( index[ipart]<0 ) {
+                continue;
+            }
+            array[ipart] = arr[ipart];
+        }
+        Py_DECREF( ret );
+        SMILEI_PY_RELEASE_GIL
     };
 
     PyObject *function;
-    ParticleData particleData;
 };
 #endif
 
@@ -647,9 +647,9 @@ class Histogram_jx : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart] * ( double )( s->particles->Charge[ipart] )
                                * s->particles->Momentum[0][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -660,9 +660,9 @@ class Histogram_jx : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -681,9 +681,9 @@ class Histogram_jy : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart] * ( double )( s->particles->Charge[ipart] )
                                * s->particles->Momentum[1][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -694,9 +694,9 @@ class Histogram_jy : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[1][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -715,9 +715,9 @@ class Histogram_jz : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart] * ( double )( s->particles->Charge[ipart] )
                                * s->particles->Momentum[2][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -728,9 +728,9 @@ class Histogram_jz : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[2][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -748,9 +748,9 @@ class Histogram_ekin : public Histogram
                     continue;
                 }
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
-                               * ( sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                         + pow( s->particles->Momentum[1][ipart], 2 )
-                                         + pow( s->particles->Momentum[2][ipart], 2 ) ) - 1. );
+                               * ( sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] ) - 1. );
             }
         }
         // Photons
@@ -760,9 +760,9 @@ class Histogram_ekin : public Histogram
                     continue;
                 }
                 array[ipart] = s->particles->Weight[ipart]
-                               * ( sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                         + pow( s->particles->Momentum[1][ipart], 2 )
-                                         + pow( s->particles->Momentum[2][ipart], 2 ) ) );
+                               * ( sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] ) );
             }
         }
     };
@@ -808,9 +808,9 @@ class Histogram_p : public Histogram
                     continue;
                 }
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
-                               * sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -820,9 +820,9 @@ class Histogram_p : public Histogram
                     continue;
                 }
                 array[ipart] = s->particles->Weight[ipart]
-                               * sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -918,10 +918,10 @@ class Histogram_pressure_xx : public Histogram
                     continue;
                 }
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
-                               * pow( s->particles->Momentum[0][ipart], 2 )
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * ( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart] )
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -931,10 +931,10 @@ class Histogram_pressure_xx : public Histogram
                     continue;
                 }
                 array[ipart] = s->particles->Weight[ipart]
-                               * pow( s->particles->Momentum[0][ipart], 2 )
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * ( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart] )
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -952,10 +952,10 @@ class Histogram_pressure_yy : public Histogram
                     continue;
                 }
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
-                               * pow( s->particles->Momentum[1][ipart], 2 )
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * ( s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart] )
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -965,10 +965,10 @@ class Histogram_pressure_yy : public Histogram
                     continue;
                 }
                 array[ipart] = s->particles->Weight[ipart]
-                               * pow( s->particles->Momentum[1][ipart], 2 )
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * ( s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart] )
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -986,10 +986,10 @@ class Histogram_pressure_zz : public Histogram
                     continue;
                 }
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
-                               * pow( s->particles->Momentum[2][ipart], 2 )
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * ( s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] )
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -999,10 +999,10 @@ class Histogram_pressure_zz : public Histogram
                     continue;
                 }
                 array[ipart] = s->particles->Weight[ipart]
-                               * pow( s->particles->Momentum[2][ipart], 2 )
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               * ( s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] )
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -1022,9 +1022,9 @@ class Histogram_pressure_xy : public Histogram
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
                                * s->particles->Momentum[1][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -1036,9 +1036,9 @@ class Histogram_pressure_xy : public Histogram
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
                                * s->particles->Momentum[1][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -1058,9 +1058,9 @@ class Histogram_pressure_xz : public Histogram
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
                                * s->particles->Momentum[2][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -1072,9 +1072,9 @@ class Histogram_pressure_xz : public Histogram
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
                                * s->particles->Momentum[2][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -1094,9 +1094,9 @@ class Histogram_pressure_yz : public Histogram
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
                                * s->particles->Momentum[1][ipart]
                                * s->particles->Momentum[2][ipart]
-                               / sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
         // Photons
@@ -1108,9 +1108,9 @@ class Histogram_pressure_yz : public Histogram
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[1][ipart]
                                * s->particles->Momentum[2][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -1129,9 +1129,9 @@ class Histogram_ekin_vx : public Histogram
                 }
                 array[ipart] = s->mass_ * s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
-                               * ( 1. - 1./sqrt( 1. + pow( s->particles->Momentum[0][ipart], 2 )
-                                                 + pow( s->particles->Momentum[1][ipart], 2 )
-                                                 + pow( s->particles->Momentum[2][ipart], 2 ) ) );
+                               * ( 1. - 1./sqrt( 1. + s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] ) );
             }
         }
         // Photons
@@ -1142,9 +1142,9 @@ class Histogram_ekin_vx : public Histogram
                 }
                 array[ipart] = s->particles->Weight[ipart]
                                * s->particles->Momentum[0][ipart]
-                               / sqrt( pow( s->particles->Momentum[0][ipart], 2 )
-                                       + pow( s->particles->Momentum[1][ipart], 2 )
-                                       + pow( s->particles->Momentum[2][ipart], 2 ) );
+                               / sqrt( s->particles->Momentum[0][ipart] * s->particles->Momentum[0][ipart]
+                                     + s->particles->Momentum[1][ipart] * s->particles->Momentum[1][ipart]
+                                     + s->particles->Momentum[2][ipart] * s->particles->Momentum[2][ipart] );
             }
         }
     };
@@ -1156,39 +1156,40 @@ class Histogram_user_function : public Histogram
 public:
     Histogram_user_function( PyObject *deposited_quantity_object ) :
         Histogram(),
-        function( deposited_quantity_object ),
-        particleData( 0 )
+        function( deposited_quantity_object )
     {};
     ~Histogram_user_function()
     {
+        SMILEI_PY_ACQUIRE_GIL
         Py_DECREF( function );
+        SMILEI_PY_RELEASE_GIL
     };
 private:
     void valuate( Species *s, double *array, int *index )
     {
         unsigned int npart = s->getNbrOfParticles();
-        #pragma omp critical
+        PyArrayObject *ret;
+        SMILEI_PY_ACQUIRE_GIL
+        // Expose particle data as numpy arrays
         {
-            // Expose particle data as numpy arrays
-            particleData.resize( npart );
+            ParticleData particleData( npart );
             particleData.set( s->particles );
             // run the function
-            PyArrayObject *ret = ( PyArrayObject * )PyObject_CallFunctionObjArgs( function, particleData.get(), NULL );
-            particleData.clear();
-            // Copy the result to "array"
-            double *arr = ( double * ) PyArray_GETPTR1( ret, 0 );
-            for( unsigned int ipart = 0 ; ipart < npart ; ipart++ ) {
-                if( index[ipart]<0 ) {
-                    continue;
-                }
-                array[ipart] = arr[ipart];
-            }
-            Py_DECREF( ret );
+            ret = ( PyArrayObject * )PyObject_CallFunctionObjArgs( function, particleData.get(), NULL );
         }
+        // Copy the result to "array"
+        double *arr = ( double * ) PyArray_GETPTR1( ret, 0 );
+        for( unsigned int ipart = 0 ; ipart < npart ; ipart++ ) {
+            if( index[ipart]<0 ) {
+                continue;
+            }
+            array[ipart] = arr[ipart];
+        }
+        Py_DECREF( ret );
+        SMILEI_PY_RELEASE_GIL
     };
-
+    
     PyObject *function;
-    ParticleData particleData;
 };
 #endif
 

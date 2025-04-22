@@ -82,20 +82,12 @@ public:
     //! alpha parameter in the Tong-Lin ionization model
     double ionization_tl_parameter_;
 
-    //! model for Cnl coefficients in the tunneling formula
-    //! 0 for ADK (default)
-    //! 1 for PPT (Hartree)
-    //! 2 for custom table provided in cnl_squared_table_
-    unsigned int cnl_model_;
-
-    //! True: m=0 for all electrons during ionization (default)
-    //! False: m!=0 and is taken from IonizationTables::magnetic_atomic_number
-    bool m_equal_zero_;
-    bool use_g_factor_;
-
-    //! array of custom Cnl^2 values (in the notation of PPT and ADK) for all atomic states, should be of length Z
-    //! used when cnl_model_ == 2
-    std::vector<double> cnl_squared_table_;
+    //! array of custom ionization potentials, l-, and m-numbers
+    //! used in ionization model "tunnel_custom_tables"
+    std::vector<double> ionization_potentials_;
+    std::vector<double> azimuthal_quantum_numbers_;
+    std::vector<double> magnetic_quantum_numbers_;
+    std::vector<double> g_factors_;
 
     //! user defined ionization rate profile
     PyObject *ionization_rate_;
@@ -471,11 +463,6 @@ public:
             Params &, 
             Patch *, SmileiMPI * ) {};
 
-    virtual void scalarPonderomotiveUpdateSusceptibilityAndMomentumTasks( double, 
-            ElectroMagn *,
-            Params &, 
-            Patch *, SmileiMPI *, int ) {};
-
     virtual void scalarPonderomotiveUpdatePositionAndCurrents( double, unsigned int,
             ElectroMagn *,
             Params &, bool, PartWalls *,
@@ -631,45 +618,7 @@ public:
     //! Erase all particles with zero weight
     void eraseWeightlessParticles();
 
-#ifdef _OMPTASKS
-
-    //! Method calculating the Particle dynamics (interpolation, pusher, projection, ...) with tasks
-    virtual void dynamicsTasks(     double time, unsigned int ispec,
-                            ElectroMagn *EMfields,
-                            Params &params, bool diag_flag,
-                            PartWalls *partWalls, Patch *patch, SmileiMPI *smpi,
-                            RadiationTables &RadiationTables,
-                            MultiphotonBreitWheelerTables &MultiphotonBreitWheelerTables, int buffer_id );
-
-    //! Method projecting susceptibility and calculating the particles updated momentum (interpolation, momentum pusher), only particles interacting with envelope
-    virtual void ponderomotiveUpdateSusceptibilityAndMomentumTasks( double time_dual,
-            ElectroMagn *EMfields,
-            Params &params,
-            Patch *patch, SmileiMPI *smpi, int buffer_id );
-
-    //! Method calculating the Particle updated position (interpolation, position pusher, only particles interacting with envelope)
-    // and projecting charge density and thus current density (through Esirkepov method) for Maxwell's Equations
-    virtual void ponderomotiveUpdatePositionAndCurrentsTasks( double time_dual, unsigned int ispec,
-            ElectroMagn *EMfields,
-            Params &params, bool diag_flag, PartWalls *partWalls,
-            Patch *patch, SmileiMPI *smpi, int buffer_id );
-
-    //! Method calculating the Particle dynamics with scalar operators (interpolation, pusher, projection) with tasks
-    virtual void scalarDynamicsTasks( double, unsigned int,
-                                  ElectroMagn *,
-                                  Params &, bool,
-                                  PartWalls *, Patch *, SmileiMPI *,
-                                  RadiationTables &,
-                                  MultiphotonBreitWheelerTables &, int ) {};
-
-    virtual void scalarPonderomotiveUpdatePositionAndCurrentsTasks( double, unsigned int,
-            ElectroMagn *,
-            Params &, bool, PartWalls *,
-            Patch *, SmileiMPI *, int ) {};
-
-#endif
-
-    // ---- Variables for tasks
+    // ---- Variables for tasks -> does not look like it's only used for tasks now ...
 
     // Number of bins for the use of tasks
     unsigned int Nbins;

@@ -143,8 +143,12 @@ The block ``Main`` is **mandatory** and has the following syntax::
 
   Interpolation order, defines particle shape function:
 
+  * ``1``  : 2 points stencil in r with Ruyten correction, 3 points stencil in x. Supported only in AM geometry.
   * ``2``  : 3 points stencil, supported in all configurations.
   * ``4``  : 5 points stencil, not supported in vectorized 2D geometry.
+
+  The Ruyten correction is the scheme described bu equation 4.2 in `this paper <https://www.sciencedirect.com/science/article/abs/pii/S0021999183710703>`_ .
+  It allows for a more accurate description on axis at the cost of a higher statistic noise so it often requires the use of more macro-particles.
 
 .. py:data:: interpolator
 
@@ -232,10 +236,6 @@ The block ``Main`` is **mandatory** and has the following syntax::
   The finest sorting is achieved with ``cluster_width=1`` and no sorting with ``cluster_width`` equal to the full size of a patch along dimension X.
   The cluster size in dimension Y and Z is always the full extent of the patch.
 
-  .. warning::
-
-    The size of clusters becomes particularly important when :doc:`/Understand/task_parallelization` is used.
-
 .. py:data:: maxwell_solver
 
   :default: 'Yee'
@@ -244,10 +244,11 @@ The block ``Main`` is **mandatory** and has the following syntax::
   Only ``"Yee"`` and ``"M4"`` are available for all geometries at the moment.
   ``"Cowan"``, ``"Grassi"``, ``"Lehe"`` and ``"Bouchard"`` are available for ``2DCartesian``.
   ``"Lehe"`` and ``"Bouchard"`` are available for ``3DCartesian``.
-  ``"Lehe"`` is available for ``AMcylindrical``.
+  ``"Lehe"`` and ``"Terzani"`` are available for ``AMcylindrical``.
   The M4 solver is described in `this paper <https://doi.org/10.1016/j.jcp.2020.109388>`_.
   The Lehe solver is described in `this paper <https://journals.aps.org/prab/abstract/10.1103/PhysRevSTAB.16.021301>`_.
-  The Bouchard solver is described in `this thesis p. 109 <https://tel.archives-ouvertes.fr/tel-02967252>`_
+  The Bouchard solver is described in `this thesis p. 109 <https://tel.archives-ouvertes.fr/tel-02967252>`_.
+  The Terzani solver is described in `this paper <https://doi.org/10.1016/j.cpc.2019.04.007>`_.
 
 .. py:data:: solve_poisson
 
@@ -981,7 +982,10 @@ Each species has to be defined in a ``Species`` block::
 
   The model for ionization:
 
-  * ``"tunnel"`` for :ref:`field ionization <field_ionization>` (requires species with an :py:data:`atomic_number`)
+  * ``"tunnel"`` for :ref:`field ionization <field_ionization>` using :ref:`PPT-ADK <ppt_adk>` (requires species with an :py:data:`atomic_number`)
+  * ``"tunnel_full_PPT"`` for :ref:`field ionization <field_ionization>` using :ref:`PPT-ADK with account for magnetic number<ppt_adk>` (requires species with an :py:data:`atomic_number`)
+  * ``"tunnel_TL"`` for :ref:`field ionization <field_ionization>` using :ref:`Tong and Lin <tong_lin>`'s rate (requires species with an :py:data:`atomic_number`)
+  * ``"tunnel_BSI"`` for :ref:`field ionization <field_ionization>` using :ref:`Ouatu <ouatu>`'s rate (requires species with an :py:data:`atomic_number`)
   * ``"tunnel_envelope_averaged"`` for :ref:`field ionization with a laser envelope <field_ionization_envelope>`
   * ``"from_rate"``, relying on a :ref:`user-defined ionization rate <rate_ionization>` (requires species with a :py:data:`maximum_charge_state`).
 
@@ -1386,8 +1390,8 @@ Lasers
 ^^^^^^
 
 A laser consists in applying oscillating boundary conditions for the magnetic
-field on one of the box sides. The only boundary condition that supports lasers
-is ``"silver-muller"`` (see :py:data:`EM_boundary_conditions`).
+field on one of the box sides. The only boundary conditions that support lasers
+are ``"silver-muller"`` and ``"PML"`` (see :py:data:`EM_boundary_conditions`).
 There are several syntaxes to introduce a laser in :program:`Smilei`:
 
 .. note::
@@ -1436,10 +1440,10 @@ There are several syntaxes to introduce a laser in :program:`Smilei`:
 
 .. py:data:: space_time_profile_AM
 
-    :type: A list of maximum 2 x ``number_of_AM`` *python* functions.
+    :type: A list of maximum 2 x ``number_of_AM`` complex valued *python* functions.
 
-    These profiles define the first modes of :math:`B_r` and :math:`B_\theta` in the
-    order shown in the above example. Undefined modes are considered zero.
+    These profiles define the first modes of :math:`B_r` and :math:`B_\theta` of the laser in the
+    order shown in the above example. Higher undefined modes are considered zero.
     This can be used only in ``AMcylindrical`` geometry. In this
     geometry a two-dimensional :math:`(x,r)` grid is used and the laser is injected from a
     :math:`x` boundary, thus the provided profiles must be a function of :math:`(r,t)`.
@@ -2009,8 +2013,8 @@ at the beginning of the simulation using the ``ExternalField`` block::
 
 .. py:data:: field
 
-  Field name in Cartesian geometries: ``"Ex"``, ``"Ey"``, ``"Ez"``, ``"Bx"``, ``"By"``, ``"Bz"``, ``"Bx_m"``, ``"By_m"``, ``"Bz_m"``
-  Field name in AM geometry: ``"El"``, ``"Er"``, ``"Et"``, ``"Bl"``, ``"Br"``, ``"Bt"``, ``"Bl_m"``, ``"Br_m"``, ``"Bt_m"``, ``"A"``, ``"A0"`` .
+  Field names in Cartesian geometries: ``"Ex"``, ``"Ey"``, ``"Ez"``, ``"Bx"``, ``"By"``, ``"Bz"``, ``"Bx_m"``, ``"By_m"``, ``"Bz_m"``.
+  Field names in AM geometry: ``"El_mode_m"``, ``"Er_mode_m"``, ``"Et_mode_m"``, ``"Bl_mode_m"``, ``"Br_mode_m"``, ``"Bt_mode_m"``, ``"Bl_m_mode_m"``, ``"Br_m_mode_m"``, ``"Bt_m_mode_m"``, ``"A_mode_1"``, ``"A0_mode_1"`` .
 
 .. py:data:: profile
 
@@ -2055,12 +2059,24 @@ This feature is accessible using the ``PrescribedField`` block::
 
 .. py:data:: field
 
-  Field name: ``"Ex"``, ``"Ey"``, ``"Ez"``, ``"Bx_m"``, ``"By_m"`` or ``"Bz_m"``.
+  Field names in Cartesian geometries: ``"Ex"``, ``"Ey"``, ``"Ez"``, ``"Bx_m"``, ``"By_m"`` or ``"Bz_m"``.
+  Field names in AM geometry: ``"El_mode_m"``, ``"Er_mode_m"``, ``"Et_mode_m"``, ``"Bl_m_mode_m"``, ``"Br_m_mode_m"`` or ``"Bt_m_mode_m"``.
 
 .. warning::
 
   When prescribing a magnetic field, always use the time-centered fields ``"Bx_m"``, ``"By_m"`` or ``"Bz_m"``.
   These fields are those used in the particle pusher, and are defined at integer time-steps.
+
+.. warning::
+
+  When prescribing a field in AM geometry, the mode "m" must be specified explicitly in the name of the field and the profile
+  must return a complex value.
+
+.. warning::
+
+  ``PrescribedFields`` are not visible in the ``Field`` diagnostic, 
+  but can be visualised through ``Probes`` and with the fields attributes of ``TrackParticles`` 
+  (since they sample the total field acting on the macro-particles).
 
 .. py:data:: profile
 
@@ -2953,7 +2969,7 @@ for instance::
 
   :default: 1
 
-  The number of time-steps during which the data is averaged before output.
+  The number of time-steps during which the data is averaged. The data is averaged over `time_average` consecutive iterations after the selected time.
 
 
 .. py:data:: species

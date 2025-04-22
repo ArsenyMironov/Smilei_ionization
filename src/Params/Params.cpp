@@ -103,6 +103,9 @@ Params::Params( SmileiMPI *smpi, std::vector<std::string> namelistsFiles ) :
     string seterr( "seterr" );
     string sChar( "s" );
     Py_DECREF( PyObject_CallMethod( numpy, &seterr[0], &sChar[0], "ignore" ) );
+    string numpy_version = "";
+    PyTools::getAttr( numpy, "__version__", numpy_version );
+    MESSAGE( "Numpy version " << numpy_version );
     Py_DECREF( numpy );
 #else
     WARNING("Numpy not found. Some options will not be available");
@@ -281,10 +284,6 @@ Params::Params( SmileiMPI *smpi, std::vector<std::string> namelistsFiles ) :
         if( interpolation_order != 1 && is_spectral ) {
             ERROR_NAMELIST( "Main.interpolation_order " << interpolation_order << " should be 1 for PSATD solver",
             LINK_NAMELIST + std::string("#main-variables") );
-        }
-        if( interpolation_order != 2 && !is_spectral ){
-            ERROR_NAMELIST( "Main.interpolation_order " << interpolation_order << " should be 2 for FDTD solver.",
-            LINK_NAMELIST + std::string("#main-variables"));
         }
     } else if( interpolation_order!=2 && interpolation_order!=4 && !is_spectral ) {
         ERROR_NAMELIST( "Main.interpolation_order " << interpolation_order << " should be 2 or 4",
@@ -554,8 +553,12 @@ Params::Params( SmileiMPI *smpi, std::vector<std::string> namelistsFiles ) :
     // This method is detailed in P.-L. Bourgeois and X. Davoine (2023) https://doi.org/10.1017/S0022377823000223
     use_BTIS3 = false;
     PyTools::extract( "use_BTIS3_interpolation", use_BTIS3, "Main"   );
-    if (use_BTIS3 && interpolation_order != 2 ){
-        ERROR("B-TIS3 interpolation implemented only at order 2.");
+    if (use_BTIS3 && interpolation_order != 2 && (interpolation_order != 1 || geometry != "AMcylindrical" || is_spectral==true )){
+        if (geometry=="AMcylindrical"){
+            ERROR("B-TIS3 interpolation is not implemented for PSATD solver.");
+        } else {
+            ERROR("B-TIS3 interpolation is implemented only at order 2 for Cartesian geometries.");
+        }
     }
     
     // Current filter properties
@@ -657,12 +660,6 @@ Params::Params( SmileiMPI *smpi, std::vector<std::string> namelistsFiles ) :
     if( timestep>dtCFL && !is_spectral ) {
         WARNING( "CFL problem: timestep=" << timestep << " should be smaller than " << dtCFL );
     }
-
-    // mark if OpenMP tasks are used or not
-    omptasks = false;
-#ifdef _OMPTASKS
-    omptasks = true;
-#endif
 
     // cluster_width_
     PyTools::extract( "cluster_width", cluster_width_, "Main"   );
@@ -868,7 +865,8 @@ Params::Params( SmileiMPI *smpi, std::vector<std::string> namelistsFiles ) :
         if( geometry!="1Dcartesian"
                 && geometry!="2Dcartesian"
                 && geometry!="3Dcartesian" ) {
-            ERROR_NAMELIST( "Collisions only valid for cartesian geometries for the moment",  LINK_NAMELIST + std::string("#collisions-reactions") );
+            //ERROR_NAMELIST( "Collisions only valid for cartesian geometries for the moment",  LINK_NAMELIST + std::string("#collisions-reactions") );
+            WARNING( "Collisions in AM geometry is experimental and valid only with a single mode" );
         }
 
     }
@@ -985,9 +983,6 @@ Params::Params( SmileiMPI *smpi, std::vector<std::string> namelistsFiles ) :
 
     // add the read or computed value of cluster_width_ to the content of smilei.py
     namelist += string( "Main.cluster_width= " ) + to_string( cluster_width_ ) + "\n";
-
-    // add the use (or or not) of the OpenMP tasks to the content of smilei.py
-    namelist += string( "Main.omptasks= " ) + to_string( omptasks ) + "\n";
 
     // Now the string "namelist" contains all the python files concatenated
     // It is written as a file: smilei.py
@@ -1361,6 +1356,9 @@ void Params::print_init()
 
     TITLE( "Geometry: " << geometry );
     MESSAGE( 1, "Interpolation order : " <<  interpolation_order );
+    if (use_BTIS3){
+        MESSAGE(1, "B-TIS3 interpolation scheme activated")
+    }
     MESSAGE( 1, "Maxwell solver : " <<  maxwell_sol );
     MESSAGE( 1, "simulation duration = " << simulation_time <<",   total number of iterations = " << n_time);
     MESSAGE( 1, "timestep = " << timestep << " = " << timestep/dtCFL << " x CFL,   time resolution = " << res_time);
@@ -1530,12 +1528,6 @@ void Params::print_parallelism_params( SmileiMPI *smpi )
 #else
         MESSAGE( 1, "OpenMP disabled" );
 #endif
-#ifdef _OMPTASKS
-        MESSAGE( 1, "OpenMP task parallelization activated");
-#else
-        MESSAGE( 1, "OpenMP task parallelization not activated");
-#endif
-        MESSAGE( "" );
 
         ostringstream np;
         np << "Number of patches: " << number_of_patches[0];
@@ -1832,7 +1824,7 @@ void Params::multiple_decompose_3D()
     // Number of domain in 3D
     // Decomposition in 2 times, X and larger side
     double tmp = (double)(number_of_patches[0]*number_of_patches[0]) / (double)(number_of_patches[1]*number_of_patches[2]);
-    number_of_region[0] = min( sz, max(1, (int) pow( (double)sz*tmp, 1./3. ) ) );
+    number_of_region[0] = min( sz, max(1, (int) (cbrt (sz*tmp)) ) );
 
     int rest = (int)(sz / number_of_region[0]);
     while ( (int)number_of_region[0]*rest != sz ) {

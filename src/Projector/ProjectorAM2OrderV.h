@@ -17,10 +17,10 @@ public:
     ~ProjectorAM2OrderV();
     
     //! Project global current densities (EMfields->Jl_/Jr_/Jt_)
-    void currents(ElectroMagnAM *emAM, Particles &particles, unsigned int istart, unsigned int iend, double *invgf, int *iold, double *deltaold, std::complex<double> *array_eitheta_old, int npart_total, int ipart_ref = 0 );
+    void currents(ElectroMagnAM *emAM, Particles &particles, unsigned int istart, unsigned int iend, double *invgf, int *iold, double *deltaold, std::complex<double> *array_eitheta_old, int npart_total, int ipart_ref = 0, int ispec =0 );
 
     //! Project global current densities (EMfields->Jl_/Jr_/Jt_/rho), diagFields timestep
-    void currentsAndDensity(ElectroMagnAM *emAM, Particles &particles, unsigned int istart, unsigned int iend, double *invgf, int *iold, double *deltaold, std::complex<double> *array_eitheta_old, int npart_total, int ipart_ref = 0 );
+    void currentsAndDensity(ElectroMagnAM *emAM, Particles &particles, unsigned int istart, unsigned int iend, double *invgf, int *iold, double *deltaold, std::complex<double> *array_eitheta_old, int npart_total, int ipart_ref = 0, int ispec = 0 );
 
     //! Project global current charge (EMfields->rho_), frozen & diagFields timestep
     void basicForComplex( std::complex<double> *rhoj, Particles &particles, unsigned int ipart, unsigned int type, int imode ) override final;
@@ -38,12 +38,6 @@ public:
     //!Wrapper
     void currentsAndDensityWrapper( ElectroMagn *EMfields, Particles &particles, SmileiMPI *smpi, int istart, int iend, int ithread, bool diag_flag, bool is_spectral, int ispec, int icell,  int ipart_ref ) override final;
     
-    //!Wrapper for projection on buffers
-    void currentsAndDensityWrapperOnBuffers( double *, double *, double *, double *, int, Particles &, SmileiMPI *, int, int, int, bool, bool, int, int = 0, int = 0 ) override final {};
-
-    //!Wrapper for projection on AM buffers
-    void currentsAndDensityWrapperOnAMBuffers( ElectroMagn *, std::complex<double> *, std::complex<double> *, std::complex<double> *, std::complex<double> *, int, int, Particles &, SmileiMPI *, int, int, int, bool, int = 0 ) override final {};
-
     // Project susceptibility
     void susceptibility( ElectroMagn *EMfields, Particles &particles, double species_mass, SmileiMPI *smpi, int istart, int iend,  int ithread, int icell, int ipart_ref ) override final;
     

@@ -423,12 +423,11 @@ int main( int argc, char *argv[] )
 
     if( !params.restart ) {
         TITLE( "Running diags at time t = 0" );
-#ifdef _OMPTASKS
-        vecPatches.runAllDiagsTasks( params, &smpi, 0, timers, simWindow );
-#else
-        vecPatches.runAllDiags( params, &smpi, 0, timers, simWindow );
-#endif
-        
+        #pragma omp parallel shared( smpi, params, vecPatches, simWindow )
+        {
+            vecPatches.runAllDiags( params, &smpi, 0, timers, simWindow );
+        }
+        vecPatches.rebootDiagTimers();
     }
 
     TITLE( "Species creation summary" );
@@ -521,7 +520,9 @@ int main( int argc, char *argv[] )
             if( params.Laser_Envelope_model ) {
                 vecPatches.runEnvelopeModule( params, &smpi, simWindow, time_dual, timers, itime );
             } // end condition if Laser Envelope Model is used
-
+            
+            vecPatches.initExchParticles( params, &smpi, simWindow, time_dual, timers, itime );
+            
             // Sum densities
             vecPatches.sumDensities( params, time_dual, timers, itime, simWindow, &smpi );
 
@@ -629,8 +630,7 @@ int main( int argc, char *argv[] )
         #pragma omp parallel shared (time_dual,smpi,params, vecPatches, region, simWindow, checkpoint, itime)
         {
             // finalize particle exchanges and sort particles
-            vecPatches.finalizeExchParticlesAndSort( params, &smpi, simWindow,
-                                                 time_dual, timers, itime );
+            vecPatches.finalizeExchParticlesAndSort( params, &smpi, simWindow, time_dual, timers, itime );
 
             // Particle merging
             vecPatches.mergeParticles(params, time_dual,timers, itime );
@@ -649,7 +649,7 @@ int main( int argc, char *argv[] )
                     // Standard fields operations (maxwell + comms + boundary conditions) are completed
                     // apply prescribed fields can be considered if requested
                     if( vecPatches(0)->EMfields->prescribedFields.size() ) {
-                        #pragma omp single
+                        #pragma omp master
                         vecPatches.applyPrescribedFields( time_prim );
                         #pragma omp barrier
                     }
@@ -657,11 +657,7 @@ int main( int argc, char *argv[] )
             }
 
             // Call the various diagnostics
-#ifdef _OMPTASKS
-            vecPatches.runAllDiagsTasks( params, &smpi, itime, timers, simWindow );
-#else
             vecPatches.runAllDiags( params, &smpi, itime, timers, simWindow );
-#endif
 
             // Move window
             vecPatches.moveWindow( params, &smpi, region, simWindow, time_dual, timers, itime );
@@ -794,7 +790,6 @@ int main( int argc, char *argv[] )
 // ---------------------------------------------------------------------------------------------------------------------
 //                                               END MAIN CODE
 // ---------------------------------------------------------------------------------------------------------------------
-
 
 int executeTestMode( VectorPatch &vecPatches,
                      Region &region,

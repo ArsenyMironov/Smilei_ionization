@@ -669,9 +669,9 @@ public:
                 t << " " << this_species->boundary_conditions_[iDim][ii];
             }
         }
-        if( (params.geometry=="AMcylindrical") && ( this_species->boundary_conditions_[1][1] != "remove" ) && ( this_species->boundary_conditions_[1][1] != "stop" ) ) {
+        if( (params.geometry=="AMcylindrical") && ( this_species->boundary_conditions_[1][1] != "remove" ) && ( this_species->boundary_conditions_[1][1] != "stop" ) && ( this_species->boundary_conditions_[1][1] != "reflective" ) ) {
             ERROR_NAMELIST(
-                " In AM geometry particle boundary conditions supported in Rmax are 'remove' and 'stop' ",
+                " In AM geometry particle boundary conditions supported in Rmax are 'remove', 'reflective' and 'stop' ",
                 LINK_NAMELIST + std::string("#species")
             );
         }
@@ -740,21 +740,24 @@ public:
             this_species->maximum_charge_state_ = 0;
             PyTools::extract( "maximum_charge_state", this_species->maximum_charge_state_, "Species", ispec);
     
-            this_species->cnl_model_ = 0;
-            PyTools::extract( "cnl_model", this_species->cnl_model_, "Species", ispec);
-
-            this_species->m_equal_zero_ = true;
-            PyTools::extract( "m_equal_zero", this_species->m_equal_zero_, "Species", ispec);
-
-            this_species->use_g_factor_ = false;
-            PyTools::extract( "use_g_factor", this_species->use_g_factor_, "Species", ispec);
-
             this_species->ionization_tl_parameter_ = 6;
             PyTools::extract( "ionization_tl_parameter", this_species->ionization_tl_parameter_, "Species", ispec);
 
-            std::vector<double> cnl_sq_tab(this_species->atomic_number_);
-            PyTools::extractV( "cnl_squared_table", cnl_sq_tab, "Species", ispec);
-            this_species->cnl_squared_table_ = cnl_sq_tab;
+            std::vector<double> ion_pots(this_species->atomic_number_);
+            PyTools::extractV( "ionization_potentials", ion_pots, "Species", ispec);
+            this_species->ionization_potentials_ = ion_pots;
+
+            std::vector<double> l_nums(this_species->atomic_number_);
+            PyTools::extractV( "azimuthal_quantum_numbers", l_nums, "Species", ispec);
+            this_species->azimuthal_quantum_numbers_ = l_nums;
+
+            std::vector<double> m_nums(this_species->atomic_number_);
+            PyTools::extractV( "magnetic_quantum_numbers", m_nums, "Species", ispec);
+            this_species->magnetic_quantum_numbers_ = m_nums;
+
+            std::vector<double> g_nums(this_species->atomic_number_);
+            PyTools::extractV( "g_factors", g_nums, "Species", ispec);
+            this_species->g_factors_ = g_nums;   
 
             std::string model;
             PyTools::extract( "ionization_model", model, "Species", ispec );
@@ -776,11 +779,9 @@ public:
                         LINK_NAMELIST + std::string("#species") );
                 }
 
-                if( (model == "tunnel") || (model == "tunnel_BSI") || \
-                    (model == "tunnel_TL") || (model == "tunnel_full_PPT")  || \
-                    (model == "tunnel_PPT") || (model == "tunnel_full_ADK") || \
-                    (model == "tunnel_custom_coefficient") || (model == "tunnel_custom_coefficient_BSI") || \
-                    (model == "tunnel_custom_coefficient_TL")|| (model == "tunnel_custom_coefficient_G") ) {
+                if( (model == "tunnel") || (model == "tunnel_BSI") || (model == "tunnel_TL") || (model == "tunnel_full_PPT") || \
+                    (model == "tunnel_full_PPT_TL") || (model == "tunnel_full_PPT_BSI") || \
+                    (model == "tunnel_custom_tables") || (model == "tunnel_custom_tables_TL") || (model == "tunnel_custom_tables_BSI") ){
                     if (params.Laser_Envelope_model){
                         ERROR_NAMELIST("An envelope is present, so tunnel_envelope or tunnel_envelope_averaged ionization model should be selected for species "<<species_name,
                         LINK_NAMELIST + std::string("#species"));
@@ -1050,10 +1051,10 @@ public:
         new_species->atomic_number_                            = species->atomic_number_;
         new_species->maximum_charge_state_                     = species->maximum_charge_state_;
         new_species->ionization_tl_parameter_                  = species->ionization_tl_parameter_;
-        new_species->cnl_model_                                = species->cnl_model_;
-        new_species->m_equal_zero_                             = species->m_equal_zero_;
-        new_species->use_g_factor_                             = species->use_g_factor_;
-        new_species->cnl_squared_table_                        = species->cnl_squared_table_;
+        new_species->ionization_potentials_                    = species->ionization_potentials_;
+        new_species->azimuthal_quantum_numbers_                = species->azimuthal_quantum_numbers_;
+        new_species->magnetic_quantum_numbers_                 = species->magnetic_quantum_numbers_;
+        new_species->g_factors_                                = species->g_factors_;
         new_species->ionization_rate_                          = species->ionization_rate_;
         if( new_species->ionization_rate_!=Py_None ) {
             Py_INCREF( new_species->ionization_rate_ );
@@ -1189,11 +1190,6 @@ public:
                 // int max_eon_number = s1.getNbrOfParticles() * ( s1.atomic_number_ || s1.maximum_charge_state_ );
                 // s1.Ionize->new_electrons.initializeReserve( max_eon_number, *s1.electron_species->particles
                 s1.Ionize->new_electrons.initialize( 0, *s1.electron_species->particles );
-#ifdef _OMPTASKS
-                for( unsigned int ibin = 0 ; ibin < s1.Nbins ; ibin++ ){
-                    s1.Ionize->new_electrons_per_bin[ibin].initializeReserve( 0, *s1.electron_species->particles );
-                }
-#endif
             }
 
             // Radiating species
@@ -1222,11 +1218,6 @@ public:
                             s1.radiated_photons_ = ParticlesFactory::create( params, *patch );
                             // s1.radiated_photons_->initializeReserve( s1.getNbrOfParticles(), *s1.photon_species_->particles );
                             s1.radiated_photons_->initialize( 0, *s1.photon_species_->particles );
-#ifdef _OMPTASKS
-                            for (unsigned int ibin = 0 ; ibin < s1.Nbins ; ibin++){
-                                s1.Radiate->new_photons_per_bin_[ibin].initializeReserve( s1.getNbrOfParticles(), *s1.photon_species_->particles );
-                            }
-#endif
                             break;
                         }
                     }
@@ -1277,11 +1268,6 @@ public:
 
                             // s1.mBW_pair_particles_[k]->initializeReserve( s1.getNbrOfParticles(), *s1.mBW_pair_species_[k]->particles );
                             s1.mBW_pair_particles_[k]->initialize( 0, *s1.mBW_pair_species_[k]->particles );
-#ifdef _OMPTASKS
-                            for (unsigned int ibin = 0; ibin < s1.Nbins; ibin++){
-                                s1.Multiphoton_Breit_Wheeler_process->new_pair_per_bin[ibin][k].initializeReserve( s1.getNbrOfParticles(), *s1.mBW_pair_species_[k]->particles );
-                            }
-#endif
                             ispec2 = patch->vecSpecies.size() + 1;
                         }
                         ispec2++ ;
@@ -1324,11 +1310,6 @@ public:
                 s.electron_species_index = vector_species[i]->electron_species_index;
                 s.electron_species = patch->vecSpecies[s.electron_species_index];
                 s.Ionize->new_electrons.initialize( 0, *s.electron_species->particles );
-#ifdef _OMPTASKS
-                for (unsigned int ibin = 0 ; ibin < s.Nbins ; ibin++){
-                    s.Ionize->new_electrons_per_bin[ibin].initialize( 0, *s.electron_species->particles );
-                }
-#endif
                 s.Ionize->save_ion_charge_ = vector_species[i]->Ionize->save_ion_charge_;
             }
         }
@@ -1348,15 +1329,6 @@ public:
                     patch->vecSpecies[i]->radiated_photons_->has_quantum_parameter = patch->vecSpecies[i]->photon_species_->particles->has_quantum_parameter;
                     patch->vecSpecies[i]->radiated_photons_->has_Monte_Carlo_process = patch->vecSpecies[i]->photon_species_->particles->has_Monte_Carlo_process;
                     patch->vecSpecies[i]->radiated_photons_->initialize( 0, params.nDim_particle, params.keep_position_old );
-#ifdef _OMPTASKS
-                    unsigned int Nbins = patch->vecSpecies[i]->Nbins;
-                    for (unsigned int ibin = 0 ; ibin < Nbins ; ibin++){
-                        patch->vecSpecies[i]->Radiate->new_photons_per_bin_[ibin].tracked = patch->vecSpecies[i]->photon_species_->particles->tracked;
-                        patch->vecSpecies[i]->Radiate->new_photons_per_bin_[ibin].has_quantum_parameter = patch->vecSpecies[i]->photon_species_->particles->has_quantum_parameter;
-                        patch->vecSpecies[i]->Radiate->new_photons_per_bin_[ibin].has_Monte_Carlo_process = patch->vecSpecies[i]->photon_species_->particles->has_Monte_Carlo_process;
-                        patch->vecSpecies[i]->Radiate->new_photons_per_bin_[ibin].initialize( 0, params.nDim_particle, params.keep_position_old );
-                    }
-#endif
                 } else {
                     patch->vecSpecies[i]->photon_species_ = nullptr;
                     patch->vecSpecies[i]->radiated_photons_ = nullptr;
@@ -1380,16 +1352,6 @@ public:
                     patch->vecSpecies[i]->mBW_pair_particles_[k]->has_Monte_Carlo_process = patch->vecSpecies[i]->mBW_pair_species_[k]->particles->has_Monte_Carlo_process;
                     patch->vecSpecies[i]->mBW_pair_particles_[k]->initialize(
                         0, params.nDim_particle, params.keep_position_old );
-#ifdef _OMPTASKS
-                    unsigned int Nbins = patch->vecSpecies[i]->Nbins;
-                    for (unsigned int ibin = 0 ; ibin < Nbins ; ibin++){
-                        patch->vecSpecies[i]->Multiphoton_Breit_Wheeler_process->new_pair_per_bin[ibin][k].tracked = patch->vecSpecies[i]->mBW_pair_species_[k]->particles->tracked;
-                        patch->vecSpecies[i]->Multiphoton_Breit_Wheeler_process->new_pair_per_bin[ibin][k].has_quantum_parameter = patch->vecSpecies[i]->mBW_pair_species_[k]->particles->has_quantum_parameter;
-                        patch->vecSpecies[i]->Multiphoton_Breit_Wheeler_process->new_pair_per_bin[ibin][k].has_Monte_Carlo_process = patch->vecSpecies[i]->mBW_pair_species_[k]->particles->has_Monte_Carlo_process;
-                        patch->vecSpecies[i]->Multiphoton_Breit_Wheeler_process->new_pair_per_bin[ibin][k].initialize(
-                            0, params.nDim_particle, params.keep_position_old );
-                    }
-#endif
                 }
             } else {
                 patch->vecSpecies[i]->mBW_pair_species_[0] = nullptr;
